@@ -1,0 +1,48 @@
+query PostsFeed($count: Int, $cursor: String) {
+  posts(first: $count, after: $cursor) {
+    pageInfo {
+      hasNextPage
+      endCursor
+    }
+    edges {
+      node {
+        ... on Post {
+          id
+          name
+          tagline
+          thumbnail {
+            url
+          }
+        }
+      }
+    }
+  }
+}
+
+query Post($id: ID) {
+  post(id: $id) {
+    id
+    name
+    tagline
+    thumbnail {
+      url
+      videoUrl
+    }
+    description
+    createdAt
+    featuredAt
+    makers {
+      name
+      username
+      profileImage
+    }
+    media {
+      id: url
+      type
+      url
+      videoUrl
+    }
+    votesCount
+    website
+  }
+}

@@ -8,11 +8,14 @@
 import Foundation
 import Apollo
 
+// MARK: Types
+
 typealias Post = PostQuery.Data.Post
 typealias Media = PostQuery.Data.Post.Medium
+typealias Maker = PostQuery.Data.Post.Maker
 
-extension Post: Identifiable {}
 extension Media: Identifiable {}
+extension Maker: Identifiable {}
 
 enum PostState {
     case empty
@@ -20,6 +23,8 @@ enum PostState {
     case post(post: Post)
     case error(_: Error)
 }
+
+// MARK: Presenter
 
 class PostPresenter: ObservableObject {
 

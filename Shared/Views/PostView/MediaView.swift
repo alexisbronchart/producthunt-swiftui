@@ -7,7 +7,6 @@
 
 import SwiftUI
 import AVKit
-import XCDYouTubeKit
 
 struct MediaView: View {
 
@@ -24,45 +23,9 @@ struct MediaView: View {
     }
 }
 
-struct YoutubeVideo: View {
-
-    let urlString: String?
-
-    @State var videoURL: URL?
-    @State var errorMessage: String?
-
-    var body: some View {
-        ZStack {
-            if let url = self.videoURL {
-                VideoPlayer(player: AVPlayer(url: url))
-            }
-            if let errorMessage = errorMessage {
-                Text(errorMessage)
-            }
-        }
-        .onAppear {
-            Task {
-                await self.loadVideo()
-            }
-        }
-    }
-
-    func loadVideo() async {
-        guard let videoURL = self.urlString, let videoIdentifier = URL(string: videoURL )?.queryParams["v"] else {
-            self.errorMessage = "Couldn't get video ID."
-            return
-        }
-        let result = await XCDYouTubeClient.default().getVideo(with: videoIdentifier)
-        switch(result) {
-        case .success(let video):
-            self.videoURL = video.streamURL
-        case .failure(let error):
-            self.errorMessage = error.localizedDescription
-        }
-    }
-}
-
 struct MediaTile: View {
+    
+    @Environment(\.windowBounds) var windowBounds
 
     let media: Media
     let padding = 16.0
@@ -85,18 +48,23 @@ struct MediaTile: View {
                         } placeholder: {
                             ProgressView()
                         }
-                        Image(systemName: "play.circle")
-                            .foregroundColor(.secondary)
-                            .font(.system(size: 100))
+                        VStack {
+                            Image(systemName: "play.circle")
+                                .foregroundColor(.secondary)
+                                .font(.system(size: 100))
+                            Text("Play on YouTube")
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
-                // this was an attempt to read youtube videos using XCDYouTubeKit but it doesn't seem to be a viable option
-                // YoutubeVideo(urlString: self.media.videoUrl)
             default:
                 Text("Unsupported media type")
             }
         }
-        .frame(width: UIScreen.main.bounds.width - padding * 2, height: (UIScreen.main.bounds.width - padding * 2) / mediaRatio )
+        .frame(
+            width: windowBounds.width - padding * 2,
+            height: (windowBounds.width - padding * 2) / mediaRatio
+        )
         .cornerRadius(4)
         .shadow(radius: 8)
         .padding(padding)

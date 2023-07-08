@@ -9,10 +9,14 @@ import SwiftUI
 
 @main
 struct ProductHuntSwiftUIApp: App {
+
+    let configProvider = ConfigProvider()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .environmentObject(ConfigProvider())
+                .environmentObject(configProvider)
+                .provideScreenBounds()
         }
     }
 }

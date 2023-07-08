@@ -1,3 +1,18 @@
+fragment PostCellFragment on Post {
+  id
+  name
+  tagline
+  thumbnail {
+    url
+  }
+  votesCount
+  user {
+    id
+    name
+    profileImage
+  }
+}
+
 query PostsFeed($count: Int, $cursor: String) {
   posts(first: $count, after: $cursor) {
     pageInfo {
@@ -6,14 +21,8 @@ query PostsFeed($count: Int, $cursor: String) {
     }
     edges {
       node {
-        ... on Post {
-          id
-          name
-          tagline
-          thumbnail {
-            url
-          }
-        }
+        id
+        ...PostCellFragment
       }
     }
   }
@@ -31,7 +40,13 @@ query Post($id: ID) {
     description
     createdAt
     featuredAt
+    user {
+      id
+      name
+      profileImage
+    }
     makers {
+      id
       name
       username
       profileImage
@@ -44,5 +59,47 @@ query Post($id: ID) {
     }
     votesCount
     website
+  }
+}
+
+query User($id: ID, $count: Int, $cursor: String) {
+  user(id: $id) {
+    id
+    name
+    username
+    profileImage
+    votedPosts(first: $count, after: $cursor) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        node {
+          id
+          ...PostCellFragment
+        }
+      }
+    }
+  }
+}
+
+query UserFollowed($id: ID, $count: Int, $cursor: String) {
+  user(id: $id) {
+    following(first: $count, after: $cursor) {
+      totalCount
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+      edges {
+        node {
+          id
+          name
+          username
+          profileImage
+        }
+      }
+    }
   }
 }

@@ -8,6 +8,8 @@
 import Foundation
 import Apollo
 
+// MARK: Types
+
 typealias PostConnection = PostsFeedQuery.Data.Post
 typealias PostNode = PostsFeedQuery.Data.Post.Edge.Node
 
@@ -19,6 +21,8 @@ enum PostsFeedState {
     case posts(posts: [PostNode], hasMore: Bool, isLoadingMore: Bool)
     case error(_: Error)
 }
+
+// MARK: Presenter
 
 class PostsFeedPresenter: ObservableObject {
 
@@ -33,6 +37,10 @@ class PostsFeedPresenter: ObservableObject {
     private var currentQuery: Cancellable?
 
     private func loadPosts(from cursor: String?, reload: Bool) {
+        if reload {
+            self.currentQuery?.cancel()
+        }
+
         if self.posts.count == 0 {
             self.postsFeedState = PostsFeedState.loading
         } else {
@@ -105,7 +113,6 @@ class PostsFeedPresenter: ObservableObject {
     }
 
     func reload() {
-        self.currentQuery?.cancel()
         self.loadPosts(from: nil, reload: true)
     }
 }

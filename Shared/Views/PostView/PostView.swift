@@ -26,19 +26,28 @@ struct PostView: View {
                 }
             case .post(let post):
                 ScrollView {
-                    VStack {
+                    VStack(alignment: .leading) {
                         MediaView(medias: post.media)
+
+                        PostHeading(post: post)
+
+                        PostHunter(post: post)
+
                         VStack{
                             Text(post.description ?? "")
+                                .foregroundColor(.primary)
+                                .font(.body)
                         }
                         .padding()
+
+                        PostMakers(post: post)
                     }
                 }
             case .empty:
                 Spacer()
             }
         }
-        .navigationBarTitle(self.title)
+        .navigationTitle(self.title)
         .onAppear() {
             self.presenter.loadPost(id: self.id)
         }

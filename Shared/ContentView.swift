@@ -8,14 +8,12 @@
 import SwiftUI
 
 struct ContentView: View {
-
     @EnvironmentObject var configProvider: ConfigProvider
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             PostsFeedView()
         }
-        .navigationViewStyle(StackNavigationViewStyle())
         .accentColor(configProvider.config.theme.accentColor)
         .onAppear {
             configProvider.loadConfig()

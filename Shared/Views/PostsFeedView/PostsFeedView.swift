@@ -6,38 +6,16 @@
 //
 
 import SwiftUI
-
-struct PostCell: View {
-
-    let post: PostNode
-
-    var body: some View {
-        NavigationLink(destination: PostView(id: self.post.id, title: self.post.name)) {
-            HStack(alignment: .top) {
-                AsyncImage(url: URL(string: post.thumbnail?.url ?? "")) { image in
-                    image.resizable()
-                } placeholder: {
-                    ProgressView()
-                }
-                .frame(width: 80, height: 80)
-                .cornerRadius(4)
-                VStack(alignment: .leading) {
-                    Text(post.name)
-                        .foregroundColor(.primary)
-                        .font(.headline)
-                    Text(post.tagline)
-                        .foregroundColor(.secondary)
-                        .font(.subheadline)
-                }
-            }
-            .padding([.top, .bottom], 8)
-        }
-    }
-}
+import SwiftUINavigation
 
 struct PostsFeedView: View {
 
+    enum Route {
+        case windowBound
+    }
+
     @StateObject var presenter = PostsFeedPresenter()
+    @State var route: Route?
 
     var body: some View {
         VStack {
@@ -59,8 +37,8 @@ struct PostsFeedView: View {
             case .posts(let posts, let hasMore, let isLoadingMore):
                 List {
                     Section {
-                        ForEach(posts) { post in
-                            PostCell(post: post)
+                        ForEach(posts) { postNode in
+                            PostCell(post: postNode.fragments.postCellFragment)
                         }
                     }
 
@@ -75,12 +53,29 @@ struct PostsFeedView: View {
                 Spacer()
             }
         }
-        .navigationBarTitle("Products")
+        .navigationTitle("Products")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    self.route = .windowBound
+                } label: {
+                    Image(systemName: "rectangle.inset.filled.and.person.filled")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 12, height: 12)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(.accentColor)
+                }
+            }
+        }
         .refreshable {
             self.presenter.reload()
         }
         .onAppear() {
             self.loadPosts()
+        }
+        .navigationDestination(unwrapping: $route, case: /Route.windowBound) { _ in
+            WindowBoundsView()
         }
     }
 
